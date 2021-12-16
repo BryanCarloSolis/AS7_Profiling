@@ -1,4 +1,8 @@
 
+const STRT_REG: usize = 3;
+const STRT_VAL: usize = 25;
+const STRT_OPC: usize = 4;
+
 #[derive(Debug, PartialEq)]
 pub enum Opcode {
     CMov,
@@ -24,7 +28,7 @@ fn split_c(instruction: u32, opcode: &Opcode) -> Option<u32> {
         Opcode::LoadValue => None,
         _ => Some(
             {
-                let bits = ((1 << 3) - 1);
+                let bits = ((1 << STRT_REG) - 1);
                 let temp: u32 = bits << 0;
                 (instruction & temp) >> 0
             }
@@ -38,7 +42,7 @@ fn split_b(instruction: u32, opcode: &Opcode) -> Option<u32> {
         Opcode::LoadValue => None,
         _ => Some(
             {
-                let bits = ((1 << 3) - 1);
+                let bits = ((1 << STRT_REG) - 1);
                 let temp: u32 = bits << 3;
                 (instruction & temp) >> 3
             }
@@ -50,7 +54,7 @@ fn split_b(instruction: u32, opcode: &Opcode) -> Option<u32> {
 fn split_a(instruction: u32, opcode: &Opcode) -> u32 {
     match *opcode {
         Opcode::LoadValue => {
-            let temp: u32 = ((1 << 3) - 1) << 25;
+            let temp: u32 = ((1 << STRT_REG) - 1) << 25;
             (instruction & temp) >> 25
         },
         _ => 
@@ -68,7 +72,7 @@ fn split_value(instruction: u32, opcode: &Opcode) -> Option<u32> {
     match *opcode {
         Opcode::LoadValue => Some(
             {
-            let bits = ((1 << 25) - 1);
+            let bits = ((1 << STRT_VAL) - 1);
             let temp: u32 = bits << 0;
                 (instruction & temp) >> 0
             }
@@ -82,7 +86,7 @@ fn split_value(instruction: u32, opcode: &Opcode) -> Option<u32> {
 fn split_opcode(instruction: u32) -> Opcode {
     let opcode = 
         {
-            let bits = ((1 << 4) - 1);
+            let bits = ((1 << STRT_OPC) - 1);
             let temp: u32 = bits << 28;
                 (instruction & temp) >> 28
         };
