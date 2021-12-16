@@ -7,7 +7,6 @@ const P_ADD: usize = 0;
 #[derive(Debug)]
 pub struct Segment {
     allocated_heap: Vec<Vec<u32>>,
-
     list_allocator: Vec<usize>
 }
 
