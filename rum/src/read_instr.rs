@@ -18,7 +18,7 @@ pub fn read_instrs(file: &str) -> Vec<u32> {
     // reads and matches to then store data onto the heap in big-endian byte order
     match temp.read_to_end(&mut data) {
         Ok(_bytes) => {
-            //let length = data.len() / 4;
+            
             // loops through length of data 
             for i in 0..(data.len()/4) {
                 let index_start = i * 4;
@@ -27,7 +27,6 @@ pub fn read_instrs(file: &str) -> Vec<u32> {
                 let buffer = &data[index_start..index_end];
 
                 // reads the instructions as u32 bit words in Big Endian order
-                // let mut curs = Cursor::new(buffer);
                 let instruction = Cursor::new(buffer).read_u32::<BigEndian>().unwrap();
 
                 //pushes or stores instructions from file

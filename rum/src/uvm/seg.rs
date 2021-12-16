@@ -2,6 +2,8 @@ use std::mem;
 
 use crate::startprogram::instr::Instr;
 
+const P_ADD: usize = 0;
+
 #[derive(Debug)]
 pub struct Segment {
     allocated_heap: Vec<Vec<u32>>,
@@ -19,7 +21,7 @@ impl Segment {
 
     // Allocates memory with a vec of zeros witha given size and then returns the address of the new memory
     pub fn alloc(&mut self, size: usize) -> usize {
-        let mut mem_address = 0;
+        let mut mem_address = P_ADD;
 
         if self.list_allocator.len() == 0 {
             self.allocated_heap.push(vec![0_u32; size]);
@@ -44,7 +46,7 @@ impl Segment {
         let program = self.allocated_heap.get(address).unwrap().clone();
 
         mem::replace(
-            self.allocated_heap.get_mut(0).unwrap(),
+            self.allocated_heap.get_mut(P_ADD).unwrap(),
             program
         );
     }
@@ -52,7 +54,7 @@ impl Segment {
     // Given the program vounter, takes the instruction corresponding to it
     pub fn get_instruction(&self, pc: usize) -> Instr{
 
-        match self.allocated_heap.get(0) {
+        match self.allocated_heap.get(P_ADD) {
             Some(program) => Instr::new(program[pc]),
             None => panic!()
         }

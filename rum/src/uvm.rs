@@ -1,6 +1,8 @@
 mod seg;
 mod reg;
 
+const P_ADD: usize = 0;
+
 use std::io::prelude::*;
 use std::io::Read;
 use std::io::{stdout, stdin};
@@ -144,7 +146,7 @@ impl Uvm {
         let c = instruction.c.unwrap() as usize;
 
 
-        if self.regs.get_reg(b) as usize != 0 {
+        if self.regs.get_reg(b) as usize != P_ADD {
             self.seg.load(self.regs.get_reg(b) as usize);
         }
 
