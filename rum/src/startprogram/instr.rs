@@ -59,7 +59,7 @@ fn split_a(instruction: u32, opcode: &Opcode) -> u32 {
         },
         _ => 
             {
-                let bits = ((1 << 3) - 1);
+                let bits = ((1 << STRT_REG) - 1);
                 let temp: u32 = bits << 6;
                 (instruction & temp) >> 6
             }

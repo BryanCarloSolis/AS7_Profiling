@@ -36,93 +36,72 @@ impl Uvm {
 
     // Conditional Move
     pub fn cmov(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
+        
 
-        if self.regs.get_reg(c) != 0 {
-            self.regs.set_reg(a, self.regs.get_reg(b));
+        if self.regs.get_reg(instruction.c.unwrap() as usize) != 0 {
+            self.regs.set_reg(instruction.a as usize, self.regs.get_reg(instruction.b.unwrap() as usize));
         }
     }
 
     // Segmented Load
     pub fn load(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
+    
 
-        let array = self.seg.get_seg(self.regs.get_reg(b) as usize).unwrap();
+        let array = self.seg.get_seg(self.regs.get_reg(instruction.b.unwrap() as usize) as usize).unwrap();
 
-        self.regs.set_reg(a, array[self.regs.get_reg(c) as usize]);
+        self.regs.set_reg(instruction.a as usize, array[self.regs.get_reg(instruction.c.unwrap() as usize) as usize]);
     }
 
     // Segmentted Store
     pub fn store(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
 
-        self.seg.set_seg(self.regs.get_reg(a) as usize, self.regs.get_reg(b) as usize, self.regs.get_reg(c));
+        self.seg.set_seg(self.regs.get_reg(instruction.a as usize) as usize, 
+        self.regs.get_reg(instruction.b.unwrap() as usize) as usize, 
+        self.regs.get_reg(instruction.c.unwrap() as usize));
     }
 
     // Addition
     pub fn add(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
 
-
-        self.regs.set_reg(a, self.regs.get_reg(b).wrapping_add(self.regs.get_reg(c)));
+        self.regs.set_reg(instruction.a as usize, 
+            self.regs.get_reg(instruction.b.unwrap() as usize).wrapping_add(
+                self.regs.get_reg(instruction.c.unwrap() as usize)));
     }
 
     // Multiplication
     pub fn mul(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
 
-        self.regs.set_reg(a, self.regs.get_reg(b).wrapping_mul(self.regs.get_reg(c)));
+        self.regs.set_reg(instruction.a as usize, self.regs.get_reg(instruction.b.unwrap() as usize).wrapping_mul(self.regs.get_reg(instruction.c.unwrap() as usize)));
     }
 
     // Division
     pub fn div(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
 
-        self.regs.set_reg(a, self.regs.get_reg(b).wrapping_div(self.regs.get_reg(c)));
+        self.regs.set_reg(instruction.a as usize, self.regs.get_reg(instruction.b.unwrap() as usize).wrapping_div(self.regs.get_reg(instruction.c.unwrap() as usize)));
     }
 
     // Bitwise NAND
     pub fn nand(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
 
-        self.regs.set_reg(a, !(self.regs.get_reg(b) & self.regs.get_reg(c)));
+        self.regs.set_reg(instruction.a as usize, !(self.regs.get_reg(instruction.b.unwrap() as usize) & self.regs.get_reg(instruction.c.unwrap() as usize)));
     }
 
     // Map Segment
     pub fn map_segment(&mut self, instruction: Instr) {
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
 
-        self.regs.set_reg(b, self.seg.alloc(self.regs.get_reg(c) as usize) as u32);
+        self.regs.set_reg(instruction.b.unwrap() as usize, self.seg.alloc(self.regs.get_reg(instruction.c.unwrap() as usize) as usize) as u32);
     }
 
     // Unmap Segment
     pub fn unmap_segment(&mut self, instruction: Instr) {
-        let c = instruction.c.unwrap() as usize;
 
-        self.seg.remove(self.regs.get_reg(c) as usize);
+        self.seg.remove(self.regs.get_reg(instruction.c.unwrap() as usize) as usize);
     }
 
     // Output
     pub fn output(&self, instruction: Instr) {
-        let c = instruction.c.unwrap() as usize;
-
         
-        stdout().write(&[self.regs.get_reg(c) as u8]).unwrap();
+        stdout().write(&[self.regs.get_reg(instruction.c.unwrap() as usize) as u8]).unwrap();
     }
 
     // Input
@@ -142,21 +121,17 @@ impl Uvm {
 
     // Load Program
     pub fn load_program(&mut self, instruction: Instr) -> usize {
-        let b = instruction.b.unwrap() as usize;
-        let c = instruction.c.unwrap() as usize;
 
-
-        if self.regs.get_reg(b) as usize != P_ADD {
-            self.seg.load(self.regs.get_reg(b) as usize);
+        if self.regs.get_reg(instruction.b.unwrap() as usize) as usize != P_ADD {
+            self.seg.load(self.regs.get_reg(instruction.b.unwrap() as usize) as usize);
         }
 
-        self.regs.get_reg(c) as usize
+        self.regs.get_reg(instruction.c.unwrap() as usize) as usize
     }
 
     // Load Value
     pub fn load_value(&mut self, instruction: Instr) {
-        let a = instruction.a as usize;
 
-        self.regs.set_reg(a, instruction.value.unwrap());
+        self.regs.set_reg(instruction.a as usize, instruction.value.unwrap());
     }
 }
